@@ -1,0 +1,103 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-01-01 13:00:00`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+
+extend type Query @guard(with: ["api"]) {
+    sequence_types(campaign_id: ID @eq): [SequenceType!]! @all @can(ability: "viewAny")
+    sequence_type(id: ID @eq): SequenceType @find @can(ability: "view", find: "id")
+
+    templates(type: String @scope(name: "type")): [Template!]! @all
+
+    campaigns(company_id: ID @eq): [Campaign!]! @all
+    campaign(id: ID @eq): Campaign @find @can(ability: "view", find: "id")
+
+    sequences(campaign_id: ID @eq): [Sequence!]! @paginate
+    # All Company Sequences
+    company_sequences(company_id: ID @eq): [Sequence!]! @all
+
+    company_users(company_id: ID @eq, orderBy: [OrderByClause!] @orderBy): [CompanyUser!]! @all
+    prebuilt_campaigns(company_id: String @eq): [Campaign!]! @all
+    company(user_id: ID @eq): Company @find
+}
+
+type SequenceType {
+    id: ID!
+    campaign_id: ID
+    template_id: ID
+    template: Template @belongsTo
+    prebuilt_start_day_after: Int
+    start_date: DateTime!
+    created_at: DateTime
+    updated_at: DateTime
+}
+
+type Template {
+    id: ID!
+    subject: String
+    attachment: String
+    company_id: ID
+    name: String
+    body: String!
+    type: String
+    created_at: DateTime
+    updated_at: DateTime
+}
+
+type Campaign {
+    id: ID!
+    company_id: String
+    name: String!
+    chat_purpose: String!
+    status: String!
+    type: String!
+    contacts: [Contact] @hasMany
+    sequence_types: [SequenceType] @hasMany
+    created_at: DateTime
+    updated_at: DateTime
+}
+
+type Sequence {
+    id: ID!
+    status: String
+    campaign_id: String
+    campaign: Campaign @belongsTo
+    contact: Contact @belongsTo
+}
+
+type Contact {
+    id: ID!
+    contact_list_id: String
+    first_name: String
+    last_name: String
+    phone: String
+    email: String
+    other: String
+    created_at: DateTime
+    updated_at: DateTime
+}
+
+type Company {
+    id: ID!
+    user_id: ID
+    name: String!
+    paymentHistories: [PaymentHistory] @morphMany
+}
+
+type CompanyUser {
+    id: ID!
+    company_id: ID
+    user: User @belongsTo
+    user_id: ID
+    created_at: DateTime
+}
+
+type Order {
+    id: ID!
+    company_id: ID
+    amount: Int!
+    status: String
+    type: String
+    description: STring
+}

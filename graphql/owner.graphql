@@ -1,0 +1,82 @@
+"A datetime string with format `Y-m-d H:i:s`, e.g. `2018-01-01 13:00:00`."
+scalar DateTime @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\DateTime")
+
+"A date string with format `Y-m-d`, e.g. `2011-05-23`."
+scalar Date @scalar(class: "Nuwave\\Lighthouse\\Schema\\Types\\Scalars\\Date")
+
+enum SortOrder {
+    ASC
+    DESC
+}
+
+input OrderByClause {
+    field: String!
+    order: SortOrder
+}
+
+type Query {
+    users: [User!]! @paginate(defaultCount: 10)
+    user(id: ID @eq): User @find
+    category(slug: String @eq): Category @find
+    merchant_categories: [MerchantCategory] @all
+    states: [State] @all
+    auth: User @auth
+    companies: [Company] @all
+}
+
+type User {
+    id: ID!
+    email: String!
+    full_name: String
+    created_at: DateTime
+    updated_at: DateTime
+    paymentHistories: [PaymentHistory] @morphMany
+}
+
+type Category {
+    id: ID!
+    name: String!
+    slug: String!
+    status: String
+    created_at: DateTime
+    updated_at: DateTime
+    attrs: [CategoryAttribute] @hasMany
+}
+
+type CategoryAttribute {
+    id: ID!
+    key: String
+    type: String
+    is_required: Boolean
+    values: [ProductAttributeValue] @hasMany
+}
+
+type ProductAttributeValue {
+    id: ID!
+    category_attribute_id: Int
+    product_id: Int
+    value: String
+}
+
+type MerchantCategory {
+    id: ID!
+    name: String!
+    slug: String!
+    code: String!
+}
+
+type State {
+    id: ID!
+    name: String!
+    code: String!
+}
+
+type PaymentHistory {
+    id: ID!
+    uniqid: String
+    amount: Int
+    currency: String
+    type: String
+    status: String
+    created_at: DateTime
+}

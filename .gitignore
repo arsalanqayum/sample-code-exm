@@ -1,0 +1,21 @@
+/node_modules
+/public/hot
+/public/storage
+/public/js/app.js
+/storage/*.key
+/vendor
+.env
+.idea
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+
+# Editor
+.vscode
+
+# Log
+horizon.log
+cron.log
